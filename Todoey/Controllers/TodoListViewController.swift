@@ -30,22 +30,9 @@ class TodoListViewController: UITableViewController {
 		newItem3.title = "Destroy Demogorgons"
 		itemArray.append(newItem3)
 		
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		itemArray.append(newItem3)
-		
-//		if let safeItems = defaults.array(forKey: defaultsKey) as? [String] {
-//			itemArray = safeItems
-//		}
+		if let safeItems = defaults.array(forKey: defaultsKey) as? [Item] {
+			itemArray = safeItems
+		}
     }
 	
 	// MARK: - TableView DataSource
