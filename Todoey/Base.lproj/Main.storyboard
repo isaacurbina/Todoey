@@ -31,7 +31,14 @@
                             <outlet property="delegate" destination="Mot-GO-2TB" id="a66-FV-Hi2"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="0lA-pB-ewr"/>
+                    <navigationItem key="navigationItem" title="Todoey" id="0lA-pB-ewr">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Clc-99-ykQ">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="Mot-GO-2TB" id="DM6-fA-tzm"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lxV-1s-kA9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
