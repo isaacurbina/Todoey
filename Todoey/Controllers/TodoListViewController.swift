@@ -16,12 +16,14 @@ class TodoListViewController: UITableViewController {
 	private let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
 	
 	// MARK: - UIViewController
+	
     override func viewDidLoad() {
         super.viewDidLoad()
 		loadItems()
     }
 	
 	// MARK: - TableView DataSource
+	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return itemArray.count
 	}
@@ -35,6 +37,7 @@ class TodoListViewController: UITableViewController {
 	}
 	
 	// MARK: - TableView Delegate
+	
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		itemArray[indexPath.row].done = !itemArray[indexPath.row].done
 		saveItems()
@@ -43,6 +46,7 @@ class TodoListViewController: UITableViewController {
 	}
 	
 	// MARK: - IBActions
+	
 	@IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
 		var textField = UITextField()
 		let alert = UIAlertController(title: "Add New Todoey Item", message: nil, preferredStyle: .alert)
@@ -64,6 +68,7 @@ class TodoListViewController: UITableViewController {
 	}
 	
 	// MARK: - private functions
+	
 	private func saveItems() {
 		let encoder = PropertyListEncoder()
 		do {
