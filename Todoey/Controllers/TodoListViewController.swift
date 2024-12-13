@@ -13,10 +13,12 @@ class TodoListViewController: UITableViewController {
 	private var itemArray : [Item]  = []
 	private let defaults = UserDefaults.standard
 	private let defaultsKey = "TodoListArray"
-
+	private let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+	
 	// MARK: - UIViewController
     override func viewDidLoad() {
         super.viewDidLoad()
+		
 		let newItem = Item()
 		newItem.title = "Find Mike"
 		newItem.done = true
@@ -30,9 +32,9 @@ class TodoListViewController: UITableViewController {
 		newItem3.title = "Destroy Demogorgons"
 		itemArray.append(newItem3)
 		
-		if let safeItems = defaults.array(forKey: defaultsKey) as? [Item] {
-			itemArray = safeItems
-		}
+//		if let safeItems = defaults.array(forKey: defaultsKey) as? [Item] {
+//			itemArray = safeItems
+//		}
     }
 	
 	// MARK: - TableView DataSource
@@ -51,6 +53,7 @@ class TodoListViewController: UITableViewController {
 	// MARK: - TableView Delegate
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+		saveItems()
 		tableView.reloadData()
 		tableView.deselectRow(at: indexPath, animated: true)
 	}
@@ -64,7 +67,7 @@ class TodoListViewController: UITableViewController {
 				let newItem = Item()
 				newItem.title = input
 				self.itemArray.append(newItem)
-				self.defaults.set(self.itemArray, forKey: self.defaultsKey)
+				self.saveItems()
 				self.tableView.reloadData()
 			}
 		}
@@ -74,5 +77,16 @@ class TodoListViewController: UITableViewController {
 		}
 		alert.addAction(action)
 		present(alert, animated: true, completion: nil)
+	}
+	
+	// MARK: - private functions
+	private func saveItems() {
+		let encoder = PropertyListEncoder()
+		do {
+			let data = try encoder.encode(itemArray)
+			try data.write(to: dataFilePath!)
+		} catch {
+			print("Error encoding item array: \(error)")
+		}
 	}
 }
