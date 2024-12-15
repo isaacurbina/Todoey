@@ -13,7 +13,7 @@ class TodoListViewController: UITableViewController {
 	
 	private var selectedCategory: Category? {
 		didSet {
-			loadItems()
+//			loadItems()
 		}
 	}
 	private var itemArray : [Item]  = []
@@ -48,12 +48,12 @@ class TodoListViewController: UITableViewController {
 	// MARK: - TableView Delegate
 	
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-		context.delete(itemArray[indexPath.row])
-		itemArray.remove(at: indexPath.row)
-		saveItems()
-		tableView.reloadData()
-		tableView.deselectRow(at: indexPath, animated: true)
+//		itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+//		context.delete(itemArray[indexPath.row])
+//		itemArray.remove(at: indexPath.row)
+//		saveItems()
+//		tableView.reloadData()
+//		tableView.deselectRow(at: indexPath, animated: true)
 	}
 	
 	// MARK: - IBActions
@@ -63,13 +63,13 @@ class TodoListViewController: UITableViewController {
 		let alert = UIAlertController(title: "Add New Todoey Item", message: nil, preferredStyle: .alert)
 		let action = UIAlertAction(title: "Add Item", style: .default) { action in
 			if let input = textField.text {
-				let newItem = Item(context: self.context)
-				newItem.title = input
-				newItem.done = false
-				newItem.parentCategory = self.selectedCategory
-				self.itemArray.append(newItem)
-				self.saveItems()
-				self.tableView.reloadData()
+//				let newItem = Item(context: self.context)
+//				newItem.title = input
+//				newItem.done = false
+//				newItem.parentCategory = self.selectedCategory
+//				self.itemArray.append(newItem)
+//				self.saveItems()
+//				self.tableView.reloadData()
 			}
 		}
 		alert.addTextField { alertTextField in
@@ -90,54 +90,54 @@ class TodoListViewController: UITableViewController {
 		}
 	}
 	
-	private func loadItems(
-		_ request: NSFetchRequest<Item> = Item.fetchRequest(),
-		_ predicate: NSPredicate? = nil
-	) {
-		let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-		if let additionalPredicate = predicate {
-			let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-			request.predicate = compoundPredicate
-		} else {
-			request.predicate = categoryPredicate
-		}
-		
-		do {
-			itemArray = try context.fetch(request)
-		} catch {
-			print("Error fetching data from context: \(error)")
-		}
-	}
+//	private func loadItems(
+//		_ request: NSFetchRequest<Item> = Item.fetchRequest(),
+//		_ predicate: NSPredicate? = nil
+//	) {
+//		let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//		if let additionalPredicate = predicate {
+//			let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+//			request.predicate = compoundPredicate
+//		} else {
+//			request.predicate = categoryPredicate
+//		}
+//		
+//		do {
+//			itemArray = try context.fetch(request)
+//		} catch {
+//			print("Error fetching data from context: \(error)")
+//		}
+//	}
 }
 
 // MARK: - UISearchBarDelegate
 
-extension TodoListViewController : UISearchBarDelegate {
-	
-	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-		let request : NSFetchRequest<Item> = Item.fetchRequest()
-		if let query = searchBar.text {
-			if !query.isEmpty {
-				let predicate = NSPredicate(format: "title CONTAINS[cd] %@", query)
-				request.sortDescriptors = [NSSortDescriptor(keyPath: \Item.title, ascending: true)]
-				loadItems(request, predicate)
-				DispatchQueue.main.async {
-					self.tableView.reloadData()
-					searchBar.resignFirstResponder()
-				}
-			}
-		}
-	}
-	
-	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-		if let query = searchBar.text {
-			if query.isEmpty {
-				loadItems()
-				tableView.reloadData()
-				DispatchQueue.main.async {
-					searchBar.resignFirstResponder()
-				}
-			}
-		}
-	}
-}
+//extension TodoListViewController : UISearchBarDelegate {
+//	
+//	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//		let request : NSFetchRequest<Item> = Item.fetchRequest()
+//		if let query = searchBar.text {
+//			if !query.isEmpty {
+//				let predicate = NSPredicate(format: "title CONTAINS[cd] %@", query)
+//				request.sortDescriptors = [NSSortDescriptor(keyPath: \Item.title, ascending: true)]
+//				loadItems(request, predicate)
+//				DispatchQueue.main.async {
+//					self.tableView.reloadData()
+//					searchBar.resignFirstResponder()
+//				}
+//			}
+//		}
+//	}
+//	
+//	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//		if let query = searchBar.text {
+//			if query.isEmpty {
+//				loadItems()
+//				tableView.reloadData()
+//				DispatchQueue.main.async {
+//					searchBar.resignFirstResponder()
+//				}
+//			}
+//		}
+//	}
+//}
