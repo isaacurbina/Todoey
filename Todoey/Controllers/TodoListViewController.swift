@@ -11,15 +11,25 @@ import CoreData
 
 class TodoListViewController: UITableViewController {
 	
+	private var selectedCategory: Category? {
+		didSet {
+			loadItems()
+		}
+	}
 	private var itemArray : [Item]  = []
-	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+	private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
 	// MARK: - UIViewController
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-		loadItems()
     }
+	
+	// MARK: - Setter/getter
+	
+	func setCategory(_ category: Category) {
+		self.selectedCategory = category
+	}
 	
 	// MARK: - TableView DataSource
 	
@@ -56,6 +66,7 @@ class TodoListViewController: UITableViewController {
 				let newItem = Item(context: self.context)
 				newItem.title = input
 				newItem.done = false
+				newItem.parentCategory = self.selectedCategory
 				self.itemArray.append(newItem)
 				self.saveItems()
 				self.tableView.reloadData()
@@ -79,7 +90,18 @@ class TodoListViewController: UITableViewController {
 		}
 	}
 	
-	private func loadItems(_ request: NSFetchRequest<Item> = Item.fetchRequest()) {
+	private func loadItems(
+		_ request: NSFetchRequest<Item> = Item.fetchRequest(),
+		_ predicate: NSPredicate? = nil
+	) {
+		let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+		if let additionalPredicate = predicate {
+			let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+			request.predicate = compoundPredicate
+		} else {
+			request.predicate = categoryPredicate
+		}
+		
 		do {
 			itemArray = try context.fetch(request)
 		} catch {
@@ -96,13 +118,13 @@ extension TodoListViewController : UISearchBarDelegate {
 		let request : NSFetchRequest<Item> = Item.fetchRequest()
 		if let query = searchBar.text {
 			if !query.isEmpty {
-				request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", query)
+				let predicate = NSPredicate(format: "title CONTAINS[cd] %@", query)
 				request.sortDescriptors = [NSSortDescriptor(keyPath: \Item.title, ascending: true)]
-			}
-			loadItems(request)
-			DispatchQueue.main.async {
-				self.tableView.reloadData()
-				searchBar.resignFirstResponder()
+				loadItems(request, predicate)
+				DispatchQueue.main.async {
+					self.tableView.reloadData()
+					searchBar.resignFirstResponder()
+				}
 			}
 		}
 	}
@@ -112,10 +134,10 @@ extension TodoListViewController : UISearchBarDelegate {
 			if query.isEmpty {
 				loadItems()
 				tableView.reloadData()
+				DispatchQueue.main.async {
+					searchBar.resignFirstResponder()
+				}
 			}
-		}
-		DispatchQueue.main.async {
-			searchBar.resignFirstResponder()
 		}
 	}
 }
