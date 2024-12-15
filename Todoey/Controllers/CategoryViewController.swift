@@ -7,10 +7,11 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
 
+	private let realm = try! Realm()
 	private var categories : [Category] = []
 	private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
@@ -27,10 +28,10 @@ class CategoryViewController: UITableViewController {
 		var textField = UITextField()
 		let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
 		let action = UIAlertAction(title: "Add", style: .default) { _ in
-			let newCategory = Category(context: self.context)
-			newCategory.name = textField.text
+			let newCategory = Category()
+			newCategory.name = textField.text!
 			self.categories.append(newCategory)
-			self.saveCategories()
+			self.save(newCategory)
 		}
 		alert.addAction(action)
 		alert.addTextField { field in
@@ -70,9 +71,11 @@ class CategoryViewController: UITableViewController {
 	
 	// MARK: - Data Manipulation Methods
 	
-	private func saveCategories() {
+	private func save(_ category: Category) {
 		do {
-			try context.save()
+			try realm.write {
+				realm.add(category)
+			}
 		} catch {
 			print("Error saving categories: \(error)")
 		}
@@ -80,12 +83,12 @@ class CategoryViewController: UITableViewController {
 	}
 	
 	private func loadCategories() {
-		let request : NSFetchRequest<Category> = Category.fetchRequest()
-		do {
-			categories = try context.fetch(request)
-		} catch {
-			print("Error loading categories: \(error)")
-		}
-		tableView.reloadData()
+//		let request : NSFetchRequest<Category> = Category.fetchRequest()
+//		do {
+//			categories = try context.fetch(request)
+//		} catch {
+//			print("Error loading categories: \(error)")
+//		}
+//		tableView.reloadData()
 	}
 }
