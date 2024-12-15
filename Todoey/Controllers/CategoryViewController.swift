@@ -53,9 +53,20 @@ class CategoryViewController: UITableViewController {
 		return cell
 	}
 	
-	// MARK: - TableView Delegate Methods
+	// MARK: - TableView Delegate
 	
-	// MARK: - Add New Categories
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		performSegue(withIdentifier: "goToItems", sender: self)
+	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		let destinationVC = segue.destination as! TodoListViewController
+		
+		if let indexPath = tableView.indexPathForSelectedRow {
+			let selectedCategory = categories[indexPath.row]
+			destinationVC.setCategory(selectedCategory)
+		}
+	}
 	
 	// MARK: - Data Manipulation Methods
 	
