@@ -7,17 +7,17 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class TodoListViewController: UITableViewController {
 	
+	private let realm = try! Realm()
 	private var selectedCategory: Category? {
 		didSet {
-//			loadItems()
+			loadItems()
 		}
 	}
-	private var itemArray : [Item]  = []
-	private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+	private var items : Results<Item>? = nil
 	
 	// MARK: - UIViewController
 	
@@ -34,26 +34,26 @@ class TodoListViewController: UITableViewController {
 	// MARK: - TableView DataSource
 	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return itemArray.count
+		return items?.count ?? 0
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-		let item = itemArray[indexPath.row]
-		cell.textLabel?.text = item.title
-		cell.accessoryType = item.done ? .checkmark : .none
+		if let item = items?[indexPath.row] {
+			cell.textLabel?.text = item.title
+			cell.accessoryType = item.done ? .checkmark : .none
+		}
 		return cell
 	}
 	
 	// MARK: - TableView Delegate
 	
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//		itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+//		items[indexPath.row].done = !itemArray[indexPath.row].done
 //		context.delete(itemArray[indexPath.row])
-//		itemArray.remove(at: indexPath.row)
+//		items.remove(at: indexPath.row)
 //		saveItems()
-//		tableView.reloadData()
-//		tableView.deselectRow(at: indexPath, animated: true)
+		tableView.deselectRow(at: indexPath, animated: true)
 	}
 	
 	// MARK: - IBActions
@@ -62,52 +62,39 @@ class TodoListViewController: UITableViewController {
 		var textField = UITextField()
 		let alert = UIAlertController(title: "Add New Todoey Item", message: nil, preferredStyle: .alert)
 		let action = UIAlertAction(title: "Add Item", style: .default) { action in
+			
 			if let input = textField.text {
-//				let newItem = Item(context: self.context)
-//				newItem.title = input
-//				newItem.done = false
-//				newItem.parentCategory = self.selectedCategory
-//				self.itemArray.append(newItem)
-//				self.saveItems()
-//				self.tableView.reloadData()
+				if let parentCategory = self.selectedCategory {
+					do {
+						try self.realm.write {
+							let newItem = Item()
+							newItem.title = input
+							newItem.done = false
+							parentCategory.items.append(newItem)
+						}
+					} catch {
+						print("Error saving new item: \(error)")
+					}
+					self.loadItems()
+				}
 			}
 		}
+		
 		alert.addTextField { alertTextField in
 			alertTextField.placeholder = "Create New Item"
 			textField = alertTextField
 		}
+		
 		alert.addAction(action)
 		present(alert, animated: true, completion: nil)
 	}
 	
 	// MARK: - private functions
 	
-	private func saveItems() {
-		do {
-			try context.save()
-		} catch {
-			print("Error saving context: \(error)")
-		}
+	private func loadItems() {
+		items = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+		tableView.reloadData()
 	}
-	
-//	private func loadItems(
-//		_ request: NSFetchRequest<Item> = Item.fetchRequest(),
-//		_ predicate: NSPredicate? = nil
-//	) {
-//		let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-//		if let additionalPredicate = predicate {
-//			let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-//			request.predicate = compoundPredicate
-//		} else {
-//			request.predicate = categoryPredicate
-//		}
-//		
-//		do {
-//			itemArray = try context.fetch(request)
-//		} catch {
-//			print("Error fetching data from context: \(error)")
-//		}
-//	}
 }
 
 // MARK: - UISearchBarDelegate
