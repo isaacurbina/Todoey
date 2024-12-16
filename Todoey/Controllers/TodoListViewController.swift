@@ -76,6 +76,7 @@ class TodoListViewController: UITableViewController {
 							let newItem = Item()
 							newItem.title = input
 							newItem.done = false
+							newItem.dateCreated = Date()
 							parentCategory.items.append(newItem)
 						}
 					} catch {
@@ -105,32 +106,25 @@ class TodoListViewController: UITableViewController {
 
 // MARK: - UISearchBarDelegate
 
-//extension TodoListViewController : UISearchBarDelegate {
-//	
-//	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//		let request : NSFetchRequest<Item> = Item.fetchRequest()
-//		if let query = searchBar.text {
-//			if !query.isEmpty {
-//				let predicate = NSPredicate(format: "title CONTAINS[cd] %@", query)
-//				request.sortDescriptors = [NSSortDescriptor(keyPath: \Item.title, ascending: true)]
-//				loadItems(request, predicate)
-//				DispatchQueue.main.async {
-//					self.tableView.reloadData()
-//					searchBar.resignFirstResponder()
-//				}
-//			}
-//		}
-//	}
-//	
-//	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//		if let query = searchBar.text {
-//			if query.isEmpty {
-//				loadItems()
-//				tableView.reloadData()
-//				DispatchQueue.main.async {
-//					searchBar.resignFirstResponder()
-//				}
-//			}
-//		}
-//	}
-//}
+extension TodoListViewController : UISearchBarDelegate {
+	
+	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+		if let query = searchBar.text {
+			if !query.isEmpty {
+				items = items?.filter("title CONTAINS[cd] %@", query).sorted(byKeyPath: "dateCreated", ascending: true)
+				tableView.reloadData()
+			}
+		}
+	}
+	
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+		if let query = searchBar.text {
+			if query.isEmpty {
+				loadItems()
+				DispatchQueue.main.async {
+					searchBar.resignFirstResponder()
+				}
+			}
+		}
+	}
+}
