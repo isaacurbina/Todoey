@@ -12,7 +12,7 @@ import RealmSwift
 class CategoryViewController: UITableViewController {
 
 	private let realm = try! Realm()
-	private var categories : [Category] = []
+	private var categories : Results<Category>? = nil
 	private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
 	// MARK: - UIViewController
@@ -30,7 +30,6 @@ class CategoryViewController: UITableViewController {
 		let action = UIAlertAction(title: "Add", style: .default) { _ in
 			let newCategory = Category()
 			newCategory.name = textField.text!
-			self.categories.append(newCategory)
 			self.save(newCategory)
 		}
 		alert.addAction(action)
@@ -44,13 +43,14 @@ class CategoryViewController: UITableViewController {
 	// MARK: - TableView DataSource
 	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return categories.count
+		return categories?.count ?? 0
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-		let item = categories[indexPath.row]
-		cell.textLabel?.text = item.name
+		if let item = categories?[indexPath.row] {
+			cell.textLabel?.text = item.name
+		}
 		return cell
 	}
 	
@@ -64,8 +64,9 @@ class CategoryViewController: UITableViewController {
 		let destinationVC = segue.destination as! TodoListViewController
 		
 		if let indexPath = tableView.indexPathForSelectedRow {
-			let selectedCategory = categories[indexPath.row]
-			destinationVC.setCategory(selectedCategory)
+			if let selectedCategory = categories?[indexPath.row] {
+				destinationVC.setCategory(selectedCategory)
+			}
 		}
 	}
 	
@@ -83,12 +84,7 @@ class CategoryViewController: UITableViewController {
 	}
 	
 	private func loadCategories() {
-//		let request : NSFetchRequest<Category> = Category.fetchRequest()
-//		do {
-//			categories = try context.fetch(request)
-//		} catch {
-//			print("Error loading categories: \(error)")
-//		}
-//		tableView.reloadData()
+		categories = realm.objects(Category.self)
+		tableView.reloadData()
 	}
 }
